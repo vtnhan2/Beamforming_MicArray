@@ -41,6 +41,7 @@
 | **[README_localization.md](README_localization.md)** | TDOA localization | Finding sound sources |
 | **[README_audio_filtering.md](README_audio_filtering.md)** | Filter types | Choosing filters |
 | **[QUICK_START_FILTERING.md](QUICK_START_FILTERING.md)** | Quick reference | Fast lookup |
+| **[GIAI_THICH_REFERENCE_BEAMFORMING.md](GIAI_THICH_REFERENCE_BEAMFORMING.md)** | 🇻🇳 Giải thích chi tiết (Tiếng Việt) | Hiểu algorithm từng bước |
 
 ---
 
