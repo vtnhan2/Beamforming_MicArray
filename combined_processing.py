@@ -9,6 +9,8 @@ import wave
 import os
 import matplotlib.pyplot as plt
 from scipy import signal as scipy_signal
+import time
+from datetime import timedelta
 
 # ============================================================================
 # BEAMFORMING
@@ -198,6 +200,11 @@ def plot_comparison(signals, labels, titles, output_file, sample_rate=16000):
 # ============================================================================
 
 def main():
+    # ========================================================================
+    # TIMING: Bắt đầu đo thời gian
+    # ========================================================================
+    start_time_total = time.time()
+    
     # Configuration
     input_file = "audio/original_8channels.pcm"
     output_dir = "audio/combined_processing"
@@ -214,6 +221,7 @@ def main():
     print(f"Input file: {input_file}")
     print(f"Output directory: {output_dir}")
     print(f"Bandpass: {bandpass_lowcut}-{bandpass_highcut} Hz")
+    print(f"Start time: {time.strftime('%Y-%m-%d %H:%M:%S')}")
     print("="*70)
     
     # Create output directory
@@ -376,6 +384,18 @@ def main():
     print("  + Beamforming: Removes spatial noise (from unwanted directions)")
     print("  + Bandpass: Removes frequency noise (outside speech range)")
     print("  + Result: Cleaner speech with better SNR")
+    
+    # ========================================================================
+    # TIMING: Thời gian tổng kết
+    # ========================================================================
+    total_elapsed = time.time() - start_time_total
+    
+    print("\n" + "="*70)
+    print("TIMING SUMMARY")
+    print("="*70)
+    print(f"Total processing time: {total_elapsed:.3f}s ({timedelta(seconds=int(total_elapsed))})")
+    print(f"End time: {time.strftime('%Y-%m-%d %H:%M:%S')}")
+    print("="*70)
     
     print("\n" + "="*70)
 

@@ -11,6 +11,8 @@ import os
 import matplotlib.pyplot as plt
 from scipy import signal as scipy_signal
 from scipy.fft import fft, fftfreq
+import time
+from datetime import timedelta
 
 class ReferenceBeamformer:
     """
@@ -347,6 +349,11 @@ def plot_channel_coherences(coherences, weights, output_file):
 # ============================================================================
 
 def main():
+    # ========================================================================
+    # TIMING: Bắt đầu đo thời gian
+    # ========================================================================
+    start_time_total = time.time()
+    
     input_file = "audio/original_8channels.pcm"
     output_dir = "audio/reference_beamforming"
     
@@ -357,13 +364,17 @@ def main():
     print(f"Input file: {input_file}")
     print(f"Output directory: {output_dir}")
     print(f"Reference channel: 5")
+    print(f"Start time: {time.strftime('%Y-%m-%d %H:%M:%S')}")
     print("="*70)
     
     # Tao thu muc output
     os.makedirs(output_dir, exist_ok=True)
     
     # Doc file audio
+    start_time_step = time.time()
     audio_data = read_pcm_file(input_file)
+    elapsed_step = time.time() - start_time_step
+    print(f"[TIMING] Doc file: {elapsed_step:.3f}s")
     
     # Chi lay channels co audio (1, 2, 3, 4, 5, 8)
     active_channels = [0, 1, 2, 3, 4, 7]  # 0-indexed
@@ -391,14 +402,18 @@ def main():
     print("STEP 1: SAVE REFERENCE SIGNAL (CHANNEL 5)")
     print("="*70)
     
+    start_time_step = time.time()
     reference_file = os.path.join(output_dir, 'reference_channel5.wav')
     save_wav(reference_signal, reference_file)
+    elapsed_step = time.time() - start_time_step
+    print(f"[TIMING] Step 1: {elapsed_step:.3f}s")
     
     # Tach vocal dua tren reference
     print("\n" + "="*70)
     print("STEP 2: REFERENCE-BASED BEAMFORMING")
     print("="*70)
     
+    start_time_step = time.time()
     vocal_extracted, delays, coherences, weights = beamformer.extract_vocal_from_reference(
         audio_active, 
         reference_channel_idx=reference_idx_in_active
@@ -407,12 +422,15 @@ def main():
     # Save vocal extracted
     vocal_file = os.path.join(output_dir, 'vocal_extracted_beamforming.wav')
     save_wav(vocal_extracted, vocal_file)
+    elapsed_step = time.time() - start_time_step
+    print(f"[TIMING] Step 2 (Beamforming): {elapsed_step:.3f}s")
     
     # Apply frequency masking (optional)
     print("\n" + "="*70)
     print("STEP 3: FREQUENCY MASKING")
     print("="*70)
     
+    start_time_step = time.time()
     print("\nApplying frequency masking (300-3000 Hz)...")
     vocal_masked = beamformer.apply_frequency_masking(
         vocal_extracted, 
@@ -422,12 +440,15 @@ def main():
     
     vocal_masked_file = os.path.join(output_dir, 'vocal_extracted_masked.wav')
     save_wav(vocal_masked, vocal_masked_file)
+    elapsed_step = time.time() - start_time_step
+    print(f"[TIMING] Step 3 (Frequency Masking): {elapsed_step:.3f}s")
     
     # Apply bandpass filter
     print("\n" + "="*70)
     print("STEP 4: BANDPASS FILTERING")
     print("="*70)
     
+    start_time_step = time.time()
     print("\nApplying bandpass filter (600-3000 Hz)...")
     nyquist = 16000 / 2
     b, a = scipy_signal.butter(4, [600/nyquist, 3000/nyquist], btype='band')
@@ -440,12 +461,15 @@ def main():
     vocal_combined = scipy_signal.filtfilt(b, a, vocal_masked)
     vocal_combined_file = os.path.join(output_dir, 'vocal_extracted_combined.wav')
     save_wav(vocal_combined, vocal_combined_file)
+    elapsed_step = time.time() - start_time_step
+    print(f"[TIMING] Step 4 (Bandpass Filtering): {elapsed_step:.3f}s")
     
     # Visualizations
     print("\n" + "="*70)
     print("STEP 5: VISUALIZATION")
     print("="*70)
     
+    start_time_step = time.time()
     # Plot coherences and weights
     coherences_plot = os.path.join(output_dir, 'channel_coherences.png')
     
@@ -483,6 +507,8 @@ def main():
     
     comparison_file = os.path.join(output_dir, 'vocal_extraction_comparison.png')
     plot_comparison(signals, labels, titles, comparison_file)
+    elapsed_step = time.time() - start_time_step
+    print(f"[TIMING] Step 5 (Visualization): {elapsed_step:.3f}s")
     
     # Calculate RMS levels
     print("\n" + "="*70)
@@ -537,6 +563,18 @@ def main():
     print("\nBest Output:")
     print(f"  >>> {vocal_combined_file}")
     print(f"  This file contains the cleanest vocal extraction")
+    
+    # ========================================================================
+    # TIMING: Thời gian tổng kết
+    # ========================================================================
+    total_elapsed = time.time() - start_time_total
+    
+    print("\n" + "="*70)
+    print("TIMING SUMMARY")
+    print("="*70)
+    print(f"Total processing time: {total_elapsed:.3f}s ({timedelta(seconds=int(total_elapsed))})")
+    print(f"End time: {time.strftime('%Y-%m-%d %H:%M:%S')}")
+    print("="*70)
     
     print("\n" + "="*70)
 

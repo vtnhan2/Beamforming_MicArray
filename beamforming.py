@@ -9,6 +9,8 @@ import wave
 import os
 import matplotlib.pyplot as plt
 from scipy import signal as scipy_signal
+import time
+from datetime import timedelta
 
 class DelayAndSumBeamformer:
     """
@@ -286,6 +288,11 @@ def plot_cartesian_pattern(azimuths, powers, output_file):
     plt.close()
 
 def main():
+    # ========================================================================
+    # TIMING: Bắt đầu đo thời gian
+    # ========================================================================
+    start_time_total = time.time()
+    
     input_file = "audio/original_8channels.pcm"
     output_dir = "audio/beamforming"
     
@@ -294,6 +301,7 @@ def main():
     print("="*60)
     print(f"Input file: {input_file}")
     print(f"Output directory: {output_dir}")
+    print(f"Start time: {time.strftime('%Y-%m-%d %H:%M:%S')}")
     print("="*60)
     
     # Tao thu muc output
@@ -389,6 +397,18 @@ def main():
     print(f"  - Giam nhieu tu cac huong khong mong muon")
     print(f"  - Nhan manh tin hieu tu huong mong muon")
     print(f"  - Directional selectivity")
+    
+    # ========================================================================
+    # TIMING: Thời gian tổng kết
+    # ========================================================================
+    total_elapsed = time.time() - start_time_total
+    
+    print("\n" + "="*60)
+    print("TIMING SUMMARY")
+    print("="*60)
+    print(f"Total processing time: {total_elapsed:.3f}s ({timedelta(seconds=int(total_elapsed))})")
+    print(f"End time: {time.strftime('%Y-%m-%d %H:%M:%S')}")
+    print("="*60)
 
 if __name__ == "__main__":
     main()
