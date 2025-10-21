@@ -461,8 +461,23 @@ def main():
     vocal_combined = scipy_signal.filtfilt(b, a, vocal_masked)
     vocal_combined_file = os.path.join(output_dir, 'vocal_extracted_combined.wav')
     save_wav(vocal_combined, vocal_combined_file)
+    
+    # Amplify combined audio by 4x
+    print("\nApplying 4x amplification...")
+    vocal_amplified = vocal_combined * 4.0
+    
+    # Check for clipping and normalize if necessary
+    max_val = np.max(np.abs(vocal_amplified))
+    if max_val > 32767:  # 16-bit limit
+        print(f"Warning: Amplification caused clipping (max: {max_val:.0f})")
+        print("Normalizing to prevent clipping...")
+        vocal_amplified = vocal_amplified * (32767 / max_val)
+        print(f"Normalized to max: {np.max(np.abs(vocal_amplified)):.0f}")
+    
+    vocal_amplified_file = os.path.join(output_dir, 'vocal_extracted_combined_ampli.wav')
+    save_wav(vocal_amplified, vocal_amplified_file)
     elapsed_step = time.time() - start_time_step
-    print(f"[TIMING] Step 4 (Bandpass Filtering): {elapsed_step:.3f}s")
+    print(f"[TIMING] Step 4 (Bandpass Filtering + Amplification): {elapsed_step:.3f}s")
     
     # Visualizations
     print("\n" + "="*70)
@@ -488,21 +503,24 @@ def main():
         vocal_extracted,
         vocal_masked,
         vocal_filtered,
-        vocal_combined
+        vocal_combined,
+        vocal_amplified
     ]
     labels = [
         'Reference (Ch 5)',
         'Beamformed',
         'Beamformed + Masked',
         'Beamformed + Filtered',
-        'Beamformed + Masked + Filtered'
+        'Beamformed + Masked + Filtered',
+        'Beamformed + Masked + Filtered + 4x Amplified'
     ]
     titles = [
         '1. Reference Signal (Channel 5)',
         '2. After Reference-Based Beamforming',
         '3. After Frequency Masking',
         '4. After Bandpass Filtering',
-        '5. Combined (Masked + Filtered)'
+        '5. Combined (Masked + Filtered)',
+        '6. Amplified (4x) - Final Output'
     ]
     
     comparison_file = os.path.join(output_dir, 'vocal_extraction_comparison.png')
@@ -520,6 +538,7 @@ def main():
     rms_masked = np.sqrt(np.mean(vocal_masked ** 2))
     rms_filtered = np.sqrt(np.mean(vocal_filtered ** 2))
     rms_combined = np.sqrt(np.mean(vocal_combined ** 2))
+    rms_amplified = np.sqrt(np.mean(vocal_amplified ** 2))
     
     print(f"\nRMS Levels:")
     print(f"  Reference (Ch 5):              {rms_reference:.2f}")
@@ -527,6 +546,7 @@ def main():
     print(f"  After masking:                 {rms_masked:.2f}")
     print(f"  After filtering:               {rms_filtered:.2f}")
     print(f"  Combined (masked + filtered):  {rms_combined:.2f}")
+    print(f"  Amplified (4x):               {rms_amplified:.2f}")
     
     # Summary
     print("\n" + "="*70)
@@ -540,7 +560,8 @@ def main():
     print(f"  2. vocal_extracted_beamforming.wav  - After beamforming")
     print(f"  3. vocal_extracted_masked.wav       - Beamformed + Masked")
     print(f"  4. vocal_extracted_filtered.wav     - Beamformed + Filtered")
-    print(f"  5. vocal_extracted_combined.wav     - Beamformed + Masked + Filtered (BEST)")
+    print(f"  5. vocal_extracted_combined.wav     - Beamformed + Masked + Filtered")
+    print(f"  6. vocal_extracted_combined_ampli.wav - Amplified 4x (FINAL OUTPUT) ⭐")
     
     print("\nVisualizations:")
     print(f"  - channel_coherences.png            - Coherences & weights")
@@ -559,10 +580,11 @@ def main():
     print(f"  5. Align and sum weighted signals")
     print(f"  6. Apply frequency masking (300-3000 Hz)")
     print(f"  7. Apply bandpass filter (600-3000 Hz)")
+    print(f"  8. Amplify signal by 4x (with clipping protection)")
     
     print("\nBest Output:")
-    print(f"  >>> {vocal_combined_file}")
-    print(f"  This file contains the cleanest vocal extraction")
+    print(f"  >>> {vocal_amplified_file}")
+    print(f"  This file contains the cleanest vocal extraction with 4x amplification")
     
     # ========================================================================
     # TIMING: Thời gian tổng kết
