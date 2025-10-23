@@ -206,8 +206,8 @@ def main():
     start_time_total = time.time()
     
     # Configuration
-    input_file = "audio/original_8channels.pcm"
-    output_dir = "audio/combined_processing"
+    input_file = "../../output/audio/original_8channels.pcm"
+    output_dir = "../../output/audio/combined_processing"
     
     # Parameters
     beamforming_azimuth = None  # None = auto-detect, or specify angle (e.g., 53.2)

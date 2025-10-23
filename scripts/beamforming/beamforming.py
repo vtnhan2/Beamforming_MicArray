@@ -293,8 +293,8 @@ def main():
     # ========================================================================
     start_time_total = time.time()
     
-    input_file = "audio/original_8channels.pcm"
-    output_dir = "audio/beamforming"
+    input_file = "../../output/audio/original_8channels.pcm"
+    output_dir = "../../output/audio/beamforming"
     
     print("="*60)
     print("DELAY-AND-SUM BEAMFORMING")

@@ -354,8 +354,8 @@ def main():
     # ========================================================================
     start_time_total = time.time()
     
-    input_file = "audio/original_8channels.pcm"
-    output_dir = "audio/reference_beamforming"
+    input_file = "../../output/audio/original_8channels.pcm"
+    output_dir = "../../output/audio/reference_beamforming"
     
     print("="*70)
     print("REFERENCE-BASED BEAMFORMING")
@@ -561,7 +561,7 @@ def main():
     print(f"  3. vocal_extracted_masked.wav       - Beamformed + Masked")
     print(f"  4. vocal_extracted_filtered.wav     - Beamformed + Filtered")
     print(f"  5. vocal_extracted_combined.wav     - Beamformed + Masked + Filtered")
-    print(f"  6. vocal_extracted_combined_ampli.wav - Amplified 4x (FINAL OUTPUT) ⭐")
+    print(f"  6. vocal_extracted_combined_ampli.wav - Amplified 4x (FINAL OUTPUT) [BEST]")
     
     print("\nVisualizations:")
     print(f"  - channel_coherences.png            - Coherences & weights")
