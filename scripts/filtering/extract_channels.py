@@ -240,9 +240,9 @@ def main():
     import argparse
     
     parser = argparse.ArgumentParser(description='Extract and Filter Audio Channels')
-    parser.add_argument('--input', '-i', default='audio/original_8channels.pcm',
+    parser.add_argument('--input', '-i', default='../../output/audio/original_8channels.pcm',
                        help='Input PCM file')
-    parser.add_argument('--output-dir', '-o', default='audio/channels',
+    parser.add_argument('--output-dir', '-o', default='../../output/audio/channels',
                        help='Output directory')
     parser.add_argument('--format', '-f', choices=['wav', 'pcm'], default='wav',
                        help='Output format (wav or pcm)')

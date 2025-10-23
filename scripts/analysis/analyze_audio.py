@@ -123,13 +123,13 @@ def plot_audio_channels(audio_data, channel_stats, sample_rate=16000):
             ax.set_facecolor('lightcoral')
     
     plt.tight_layout()
-    plt.savefig('audio_channels_analysis.png', dpi=150, bbox_inches='tight')
+    plt.savefig('../../output/visualizations/audio_channels_analysis.png', dpi=150, bbox_inches='tight')
     print("Da luu bieu do: audio_channels_analysis.png")
     
     return fig
 
 def main():
-    filename = "audio/original_8channels.pcm"
+    filename = "../../output/audio/original_8channels.pcm"
     
     # Kiểm tra file
     if not os.path.exists(filename):
@@ -178,7 +178,7 @@ def main():
             'silent_channels': [int(ch['channel']) for ch in channel_stats if not ch['has_audio']]
         }
         
-        with open('audio_analysis_result.json', 'w') as f:
+        with open('../../output/results/audio_analysis_result.json', 'w') as f:
             json.dump(result, f, indent=2)
         
         print("\nKet qua phan tich da luu: audio_analysis_result.json")

@@ -234,8 +234,8 @@ def create_summary_plot(audio_data, active_channels, output_dir, sample_rate=160
     plt.close()
 
 def main():
-    input_file = "audio/original_8channels.pcm"
-    output_dir = "audio/bandpass_600_3000"
+    input_file = "../../output/audio/original_8channels.pcm"
+    output_dir = "../../output/audio/bandpass_600_3000"
     
     print("="*60)
     print("BO LOC BANDPASS 600-3000 Hz")

@@ -327,7 +327,7 @@ def main():
     parser = argparse.ArgumentParser(description='Audio Source Localization')
     parser.add_argument('--input', '-i', default='original_8channels.pcm', 
                        help='Input PCM file')
-    parser.add_argument('--output', '-o', default='localization_result.json',
+    parser.add_argument('--output', '-o', default='../../output/results/localization_result.json',
                        help='Output JSON file')
     parser.add_argument('--config', '-c', default='odas_8ch_config.cfg',
                        help='ODAS config file')

@@ -411,8 +411,8 @@ def save_results_to_file(results, output_dir):
     print(f"Saved: {filename}")
 
 def main():
-    input_file = "audio/original_8channels.pcm"
-    output_dir = "audio/amplitude_analysis"
+    input_file = "../../output/audio/original_8channels.pcm"
+    output_dir = "../../output/audio/amplitude_analysis"
     
     print("="*80)
     print("PHAN TICH DAI AMPLITUDE TRONG AUDIO")

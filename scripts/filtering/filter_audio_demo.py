@@ -148,8 +148,8 @@ def plot_frequency_spectrum(results, channel_idx, output_dir, sample_rate=16000)
     plt.close()
 
 def main():
-    input_file = "audio/original_8channels.pcm"
-    output_dir = "audio/filtered"
+    input_file = "../../output/audio/original_8channels.pcm"
+    output_dir = "../../output/audio/filtered"
     
     print("=== DEMO CAC LOAI BO LOC AUDIO ===")
     print(f"Input file: {input_file}")

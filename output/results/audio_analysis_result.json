@@ -1,5 +1,5 @@
 {
-  "filename": "audio/original_8channels.pcm",
+  "filename": "../../output/audio/original_8channels.pcm",
   "sample_rate": 16000,
   "n_channels": 8,
   "duration": 18.4639375,

@@ -148,7 +148,7 @@ def localize_source(tdoas):
         }
 
 def main():
-    filename = "audio/original_8channels.pcm"
+    filename = "../../output/audio/original_8channels.pcm"
     output_file = "audio/localization_result.json"
     
     print("=== SIMPLE AUDIO SOURCE LOCALIZATION ===")

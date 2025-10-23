@@ -274,8 +274,8 @@ def create_summary_comparison(audio_data, active_channels, output_dir, sample_ra
     plt.close()
 
 def main():
-    input_file = "audio/original_8channels.pcm"
-    output_dir = "audio/filtered_all"
+    input_file = "../../output/audio/original_8channels.pcm"
+    output_dir = "../../output/audio/filtered_all"
     
     print("="*60)
     print("LOC TAT CA CAC CHANNELS CO AUDIO")
