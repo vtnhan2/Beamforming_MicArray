@@ -126,168 +126,254 @@ def analyze_amplitude_range(audio_data):
     return results
 
 def plot_amplitude_distribution(audio_data, output_dir):
-    """Ve bieu do phan bo amplitude"""
+    """
+    Plot amplitude distribution for each channel
+    
+    Functionality:
+    - Create histogram and box plot for each channel
+    - Display important statistics (mean, std, RMS, percentiles)
+    - Save image to amplitude_distribution.png file
+    
+    Parameters:
+    - audio_data: numpy array containing audio data (samples x channels)
+    - output_dir: output directory for saving files
+    """
     
     print("\nTao bieu do phan bo amplitude...")
     
+    # Get number of channels
     n_channels = audio_data.shape[1]
     
-    # Tao figure lon
+    # Create large figure with 2-column layout for each channel
+    # - Left column: Histogram
+    # - Right column: Box plot
     fig, axes = plt.subplots(n_channels, 2, figsize=(16, 3*n_channels))
     
+    # Iterate through each channel to create plots
     for ch in range(n_channels):
         channel_data = audio_data[:, ch]
         
-        # Histogram
+        # === HISTOGRAM (Left column) ===
         ax = axes[ch, 0]
+        
+        # Create histogram with 100 bins to display amplitude distribution
         ax.hist(channel_data, bins=100, alpha=0.7, color='blue', edgecolor='black')
         ax.set_title(f'Channel {ch+1} - Amplitude Histogram', fontweight='bold')
         ax.set_xlabel('Amplitude')
         ax.set_ylabel('Frequency')
         ax.grid(True, alpha=0.3)
         
-        # Add statistics text
-        mean_val = np.mean(channel_data)
-        std_val = np.std(channel_data)
-        rms = np.sqrt(np.mean(channel_data**2))
+        # Calculate important statistics
+        mean_val = np.mean(channel_data)      # Mean value
+        std_val = np.std(channel_data)        # Standard deviation
+        rms = np.sqrt(np.mean(channel_data**2))  # Root Mean Square
+        
+        # Draw vertical lines to mark statistical values
         ax.axvline(mean_val, color='red', linestyle='--', label=f'Mean: {mean_val:.1f}')
         ax.axvline(mean_val + std_val, color='green', linestyle='--', alpha=0.5, label=f'+1 Std: {std_val:.1f}')
         ax.axvline(mean_val - std_val, color='green', linestyle='--', alpha=0.5)
         ax.legend()
         
-        # Box plot
+        # === BOX PLOT (Right column) ===
         ax = axes[ch, 1]
+        
+        # Create box plot to display statistical distribution
+        # - Box: Q1 to Q3 (25% to 75%)
+        # - Middle line: Median (50%)
+        # - Whiskers: Min and Max
+        # - Outliers: Unusual points
         bp = ax.boxplot([channel_data], vert=True, patch_artist=True, 
                         labels=[f'Channel {ch+1}'],
-                        boxprops=dict(facecolor='lightblue'),
-                        medianprops=dict(color='red', linewidth=2))
+                        boxprops=dict(facecolor='lightblue'),      # Light blue color for box
+                        medianprops=dict(color='red', linewidth=2)) # Red median line
         ax.set_title(f'Channel {ch+1} - Amplitude Box Plot', fontweight='bold')
         ax.set_ylabel('Amplitude')
         ax.grid(True, alpha=0.3, axis='y')
         
-        # Add text with stats
-        stats_text = f'Min: {np.min(channel_data):.1f}\n'
-        stats_text += f'Q1: {np.percentile(channel_data, 25):.1f}\n'
-        stats_text += f'Median: {np.median(channel_data):.1f}\n'
-        stats_text += f'Q3: {np.percentile(channel_data, 75):.1f}\n'
-        stats_text += f'Max: {np.max(channel_data):.1f}\n'
+        # Calculate percentiles for box plot
+        min_val = np.min(channel_data)
+        q1 = np.percentile(channel_data, 25)    # Quartile 1 (25%)
+        median = np.median(channel_data)        # Median (50%)
+        q3 = np.percentile(channel_data, 75)    # Quartile 3 (75%)
+        max_val = np.max(channel_data)
+        
+        # Display important statistics next to box plot
+        stats_text = f'Min: {min_val:.1f}\n'
+        stats_text += f'Q1: {q1:.1f}\n'
+        stats_text += f'Median: {median:.1f}\n'
+        stats_text += f'Q3: {q3:.1f}\n'
+        stats_text += f'Max: {max_val:.1f}\n'
         stats_text += f'RMS: {rms:.1f}'
+        
+        # Place text box to the right of box plot
         ax.text(1.15, 0.5, stats_text, transform=ax.transAxes,
                 verticalalignment='center', bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
     
+    # Adjust layout to prevent clipping
     plt.tight_layout()
+    
+    # Save image to file
     plot_file = os.path.join(output_dir, 'amplitude_distribution.png')
     plt.savefig(plot_file, dpi=150, bbox_inches='tight')
     print(f"Saved: {plot_file}")
     plt.close()
 
 def plot_amplitude_comparison(audio_data, output_dir):
-    """Ve bieu do so sanh amplitude giua cac channels"""
+    """
+    Plot amplitude comparison between channels
+    
+    Functionality:
+    - Create bar chart comparing RMS amplitude between channels
+    - Create box plot comparing amplitude distribution
+    - Classify channels with/without audio (threshold = 100)
+    - Save image to amplitude_comparison.png file
+    
+    Parameters:
+    - audio_data: numpy array containing audio data (samples x channels)
+    - output_dir: output directory for saving files
+    """
     
     print("Tao bieu do so sanh amplitude...")
     
+    # Get number of channels
     n_channels = audio_data.shape[1]
     
+    # Create figure with 2 subplots: bar chart and box plot
     fig, axes = plt.subplots(2, 1, figsize=(14, 10))
     
-    # Bar chart - RMS comparison
+    # === BAR CHART - RMS COMPARISON (Top subplot) ===
     ax = axes[0]
+    
+    # Create channel names list and calculate RMS for each channel
     channels = [f'Ch{i+1}' for i in range(n_channels)]
     rms_values = [np.sqrt(np.mean(audio_data[:, i]**2)) for i in range(n_channels)]
+    
+    # Color classification: green if has audio (RMS > 100), red if no audio
     colors = ['green' if rms > 100 else 'red' for rms in rms_values]
     
+    # Create bar chart
     bars = ax.bar(channels, rms_values, color=colors, alpha=0.7, edgecolor='black')
     ax.set_title('RMS Amplitude Comparison Across Channels', fontsize=14, fontweight='bold')
     ax.set_xlabel('Channel')
     ax.set_ylabel('RMS Amplitude')
     ax.grid(True, alpha=0.3, axis='y')
     
-    # Add value labels on bars
+    # Display RMS values on each bar
     for i, (bar, val) in enumerate(zip(bars, rms_values)):
         height = bar.get_height()
         ax.text(bar.get_x() + bar.get_width()/2., height,
                 f'{val:.1f}',
                 ha='center', va='bottom', fontsize=10, fontweight='bold')
     
-    # Add threshold line
+    # Draw threshold line to distinguish audio/no audio
     ax.axhline(y=100, color='orange', linestyle='--', linewidth=2, label='Audio Threshold (100)')
     ax.legend()
     
-    # Box plot - All channels comparison
+    # === BOX PLOT - DISTRIBUTION COMPARISON (Bottom subplot) ===
     ax = axes[1]
+    
+    # Prepare data for box plot: each channel as separate list
     data_for_boxplot = [audio_data[:, i] for i in range(n_channels)]
+    
+    # Create box plot for all channels
     bp = ax.boxplot(data_for_boxplot, labels=channels, patch_artist=True)
     
-    # Color boxes
+    # Color boxes based on RMS values
+    # - Light green: channels with audio (RMS > 100)
+    # - Light coral: channels without audio (RMS <= 100)
     for i, patch in enumerate(bp['boxes']):
         if rms_values[i] > 100:
-            patch.set_facecolor('lightgreen')
+            patch.set_facecolor('lightgreen')  # Light green for channels with audio
         else:
-            patch.set_facecolor('lightcoral')
+            patch.set_facecolor('lightcoral')   # Light coral for channels without audio
     
     ax.set_title('Amplitude Distribution Comparison (Box Plot)', fontsize=14, fontweight='bold')
     ax.set_xlabel('Channel')
     ax.set_ylabel('Amplitude')
     ax.grid(True, alpha=0.3, axis='y')
     
+    # Adjust layout to prevent clipping
     plt.tight_layout()
+    
+    # Save image to file
     plot_file = os.path.join(output_dir, 'amplitude_comparison.png')
     plt.savefig(plot_file, dpi=150, bbox_inches='tight')
     print(f"Saved: {plot_file}")
     plt.close()
 
 def create_summary_table(results, output_dir):
-    """Tao bang tom tat"""
+    """
+    Create summary table of amplitude statistics for all channels
+    
+    Functionality:
+    - Create detailed statistics table for each channel
+    - Color classification based on audio status (with/without audio)
+    - Display important statistics: Min, Max, Peak-to-Peak, Mean, RMS, Std Dev, Dynamic Range
+    - Save image to amplitude_summary_table.png file
+    
+    Parameters:
+    - results: list containing amplitude analysis results for each channel
+    - output_dir: output directory for saving files
+    """
     
     print("\nTao bang tom tat...")
     
-    # Tao figure cho bang
+    # Create figure for table with large size to display full information
     fig, ax = plt.subplots(figsize=(16, 8))
-    ax.axis('tight')
-    ax.axis('off')
+    ax.axis('tight')  # Auto-adjust size
+    ax.axis('off')    # Turn off all axes
     
-    # Tao data cho bang
+    # Define table columns
     headers = ['Channel', 'Status', 'Min', 'Max', 'Peak-to-Peak', 'Mean', 'RMS', 'Std Dev', 'Dynamic Range (dB)']
     data = []
     
+    # Iterate through results of each channel to create table data
     for r in results:
+        # Determine status: AUDIO if has audio, SILENT if no audio
         status = 'AUDIO' if r['has_audio'] else 'SILENT'
+        
+        # Create a data row for current channel
         row = [
-            f"Ch {r['channel']}",
-            status,
-            f"{r['min']:.1f}",
-            f"{r['max']:.1f}",
-            f"{r['peak_to_peak']:.1f}",
-            f"{r['mean']:.1f}",
-            f"{r['rms']:.1f}",
-            f"{r['std']:.1f}",
-            f"{r['dynamic_range_db']:.1f}"
+            f"Ch {r['channel']}",                    # Channel number
+            status,                                  # Audio status
+            f"{r['min']:.1f}",                       # Minimum value
+            f"{r['max']:.1f}",                       # Maximum value
+            f"{r['peak_to_peak']:.1f}",             # Peak-to-peak range
+            f"{r['mean']:.1f}",                      # Mean value
+            f"{r['rms']:.1f}",                       # Root Mean Square
+            f"{r['std']:.1f}",                       # Standard deviation
+            f"{r['dynamic_range_db']:.1f}"          # Dynamic range (dB)
         ]
         data.append(row)
     
-    # Tao bang
+    # Create table with matplotlib table
     table = ax.table(cellText=data, colLabels=headers, cellLoc='center', loc='center')
-    table.auto_set_font_size(False)
-    table.set_fontsize(10)
-    table.scale(1, 2)
+    table.auto_set_font_size(False)  # Turn off auto font size adjustment
+    table.set_fontsize(10)           # Set fixed font size
+    table.scale(1, 2)                # Adjust size: width=1, height=2
     
-    # Mau cho header
+    # === COLOR HEADER ===
+    # Header has green color (#4CAF50) with white text
     for i in range(len(headers)):
-        table[(0, i)].set_facecolor('#4CAF50')
-        table[(0, i)].set_text_props(weight='bold', color='white')
+        table[(0, i)].set_facecolor('#4CAF50')        # Green background
+        table[(0, i)].set_text_props(weight='bold', color='white')  # Bold white text
     
-    # Mau cho cac dong
+    # === COLOR DATA ROWS ===
+    # Color classification based on audio status of each channel
     for i, r in enumerate(results):
         if r['has_audio']:
-            color = '#E8F5E9'  # Light green
+            color = '#E8F5E9'  # Light green for channels with audio
         else:
-            color = '#FFEBEE'  # Light red
+            color = '#FFEBEE'  # Light red for channels without audio
         
+        # Color all cells in the row
         for j in range(len(headers)):
             table[(i+1, j)].set_facecolor(color)
     
+    # Set title for table
     plt.title('Amplitude Statistics Summary', fontsize=16, fontweight='bold', pad=20)
     
+    # Save image to file
     plot_file = os.path.join(output_dir, 'amplitude_summary_table.png')
     plt.savefig(plot_file, dpi=150, bbox_inches='tight')
     print(f"Saved: {plot_file}")
